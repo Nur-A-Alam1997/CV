@@ -25,9 +25,23 @@
 
     <button type="button" onClick="window.location.reload();">Reconnect</button>
 
+    <h2>chat:</h2>
+    <div id="chat_log"></div>
+    
     <form id="broadcast" method="POST" action='#'>
         <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message" required autocomplete="off">
         <input type="submit" value="Broadcast">
+    </form>
+
+    <!-- <form id="username" method="POST" action='#'>
+        <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off">
+        <input type="submit" value="User Name">
+    </form> -->
+
+    <form id="create_room" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="create_room_data" placeholder="Create Room" required autocomplete="off">
+        <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off">
+        <input type="submit" value="Create_Room">
     </form>
    
     <!-- <form id="disconnect"  action="#"> -->
@@ -36,15 +50,18 @@
     <!-- </form> -->
 
     <form id="join" method="POST" action='#'>
-        <input type="text" name="join_room" id="join_room" placeholder="Room Name" required autocomplete="off">
-        <input type="text" name="username" id="username" placeholder="User Name" required autocomplete="off">
+        <input type="text" name="roomID" id="roomID" placeholder="Room ID" required autocomplete="off">
+        <input type="text" name="roomname" id="roomname" placeholder="Room Name" required autocomplete="off">
         <input type="submit" value="Join Room">
     </form>
 
     <h2>Receive:</h2>
     <div id="log"></div>
-    <h2>chat:</h2>
-    <div id="chat_log"></div>
+
+    <h2>Created Room:</h2>
+    <div id="private_room"></div>
+
+    
 </body>
 <script type="text/javascript" charset="utf-8">
     // var socket = io();
@@ -62,7 +79,41 @@
     });
 
     socket.on('chat', function(msg) {
-        $('#chat_log').append('<p>User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+        if (msg.user==socket.id){
+            {{request.sid}}
+            // $("#chat_log").css("color", "blue");
+            $li=$('#chat_log').append('<p style="color:red" >User: ami ashol' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+            $('html, body').animate({
+                scrollTop: $li.offset().top
+                }, 2000);
+            }
+        if (msg.user!=socket.id)
+        {   
+            // $("#chat_log").css("color", "red");
+            $li=$('#chat_log').append('<p style="color:blue" >User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+            $('html, body').animate({
+                scrollTop: $li.offset().top
+                }, 2000);
+        }
+    });
+
+    // socket.on('chat', function(msg) {
+    //     if (msg.user==socket.id){
+    //         $("#chat_log").css("color", "blue");
+    //         $li=$('#chat_log').append('<p>User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+    //         }
+    //     $('html, body').animate({
+    //         scrollTop: $li.offset().top
+    //         }, 2000);
+    // });
+
+    socket.on('private_room', function(msg) {
+        $li=$('#private_room').append('<p>Room ID: ' + msg.roomID + '</p><br>',
+        '<p>Room Name: ' + msg.roomname + '</p>',
+        '<p>User Name: ' + msg.username + '</p>');
+        $('html, body').animate({
+            scrollTop: $li.offset().top
+            }, 2000);
     });
     // $('form#connect').submit(function(event) {
     //     var socket = io({forceNew: true});
@@ -81,11 +132,17 @@
     //     return false;
     // });
     $('form#broadcast').submit(function(event) {
-        socket.emit('my broadcast event', {data: $('#broadcast_data').val(),room: socket.id});
+        socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
         return false;
     });
+
+    $('form#create_room').submit(function(event) {
+        socket.emit('create_room', {roomname: $('#create_room_data').val(),username:$('#username_data').val()});
+        return false;
+    });
+
     $('form#join').submit(function(event) {
-        socket.emit('join', {room: $('#join_room').val(),username:$('#username').val()});
+        socket.emit('join', {roomID: $('#roomID').val(),roomname:$('#roomname').val()});
         return false;
     });
     
