@@ -1,2 +1,8 @@
 Nur-A-Alam1997
-arpalove**
+arpalove**  
+
+git add .
+
+git commit -m "SQLALCHEMY and database added"
+
+git reset HEAD~1 //revert last commit back
