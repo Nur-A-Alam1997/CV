@@ -1,16 +1,20 @@
 # flask-socket-io-chat-app
 # Flask-ScketIO-Chat-App
 ## WebsocketApplication
-Unordered Lists:
-Item1 Realtimechatapplication Item2 Anonymousandauthenticateduseraccess.
-Item3 Tools–Python,Flask,SocketIO,SQL,SQLAlchemy.
+
+-Realtimechatapplication 
+-Anonymousandauthenticateduseraccess 
+-Tools–Python,Flask,SocketIO,SQL,SQLAlchemy.
 
 
-build:>python flask/app.py
+### build:
+>python flask/app.py
 
-Create room:> '/chat/<string:roomname>/<string:email>'>
+### Create room:
+>'/chat/<string:roomname>/<string:email>'>
 
-login :> 'user'
+### login :
+>'/user'
 
 # Join room
 
