@@ -40,7 +40,7 @@
 
     <form id="create_room" method="POST" action='#'>
         <input type="text" name="broadcast_data" id="create_room_data" placeholder="Create Room" required autocomplete="off">
-        <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off">
+        <!-- <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off"> -->
         <input type="submit" value="Create_Room">
     </form>
    
@@ -61,7 +61,7 @@
     <h2>Created Room:</h2>
     <div id="private_room"></div>
 
-    
+    {{user}}
 </body>
 <script type="text/javascript" charset="utf-8">
     // var socket = io();
@@ -79,15 +79,15 @@
     });
 
     socket.on('chat', function(msg) {
-        if (msg.user==socket.id){
+        if (msg.user=='{{user}}'){
             {{request.sid}}
             // $("#chat_log").css("color", "blue");
-            $li=$('#chat_log').append('<p style="color:red" >User: ami ashol' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+            $li=$('#chat_log').append('<p style="color:red" >User:' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
             $('html, body').animate({
                 scrollTop: $li.offset().top
                 }, 2000);
             }
-        if (msg.user!=socket.id)
+        if (msg.user!='{{user}}')
         {   
             // $("#chat_log").css("color", "red");
             $li=$('#chat_log').append('<p style="color:blue" >User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
@@ -156,10 +156,3 @@
         
 </script>
 </html>
-
-
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script> -->
-
-
-
-
