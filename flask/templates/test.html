@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    
+</head>
+
+<body>
+    <h1>Flask-SocketIO Test</h1>
+    <p>
+      Async mode is: <b>{{ async_mode }}</b><br>
+      Current transport is: <b><span id="transport"></span></b><br>
+      Average ping/pong latency: <b><span id="ping-pong"></span>ms</b>
+    </p>
+    <h2>Send:</h2>
+    <form id="emit" method="POST" action='#'>
+        <input type="text" name="emit_data" id="emit_data" placeholder="Message" required autocomplete="off">
+        <input type="submit" value="Echo">
+    </form>
+
+    <button type="button" onClick="window.location.reload();">Reconnect</button>
+
+    <h2>chat:</h2>
+    <div id="chat_log"></div>
+    
+    <form id="broadcast" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message" required autocomplete="off">
+        <input type="submit" value="Broadcast">
+    </form>
+
+    <!-- <form id="username" method="POST" action='#'>
+        <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off">
+        <input type="submit" value="User Name">
+    </form> -->
+
+    <form id="create_room" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="create_room_data" placeholder="Create Room" required autocomplete="off">
+        <!-- <input type="text" name="username_data" id="username_data" placeholder="User Name" required autocomplete="off"> -->
+        <input type="submit" value="Create_Room">
+    </form>
+   
+    <!-- <form id="disconnect"  action="#"> -->
+        <!-- <input type="button" id="disconnect" value="Disconnect"> -->
+        <button type="button" id="disconnect" value="Disconnect" >Disconnect</button>
+    <!-- </form> -->
+
+    <form id="join" method="POST" action='#'>
+        <input type="text" name="roomID" id="roomID" placeholder="Room ID" required autocomplete="off">
+        <input type="text" name="roomname" id="roomname" placeholder="Room Name" required autocomplete="off">
+        <input type="submit" value="Join Room">
+    </form>
+
+    <h2>Receive:</h2>
+    <div id="log"></div>
+
+    <h2>Created Room:</h2>
+    <div id="private_room"></div>
+
+    {{user}}
+</body>
+<script type="text/javascript" charset="utf-8">
+    // var socket = io();
+    // socket.on('connect', function() {
+    //     socket.emit('my event', {data: 'I\'m connected!'});
+    // });
+
+
+    $(document).ready(function(){
+    var socket = io();
+    socket.on('my response', function(msg) {
+        console.log(socket.id)
+        // socket.to('some room').emit('some event')
+        $('#log').append('<p>Received: ' + msg.data + '</p>');
+    });
+
+    socket.on('chat', function(msg) {
+        if (msg.user=='{{user}}'){
+            {{request.sid}}
+            // $("#chat_log").css("color", "blue");
+            $li=$('#chat_log').append('<p style="color:red" >User:' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+            $('html, body').animate({
+                scrollTop: $li.offset().top
+                }, 2000);
+            }
+        if (msg.user!='{{user}}')
+        {   
+            // $("#chat_log").css("color", "red");
+            $li=$('#chat_log').append('<p style="color:blue" >User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+            $('html, body').animate({
+                scrollTop: $li.offset().top
+                }, 2000);
+        }
+    });
+
+    // socket.on('chat', function(msg) {
+    //     if (msg.user==socket.id){
+    //         $("#chat_log").css("color", "blue");
+    //         $li=$('#chat_log').append('<p>User: ' + msg.user + '</p>','<p>Received: ' + msg.data + '</p>');
+    //         }
+    //     $('html, body').animate({
+    //         scrollTop: $li.offset().top
+    //         }, 2000);
+    // });
+
+    socket.on('private_room', function(msg) {
+        $li=$('#private_room').append('<p>Room ID: ' + msg.roomID + '</p><br>',
+        '<p>Room Name: ' + msg.roomname + '</p>',
+        '<p>User Name: ' + msg.username + '</p>');
+        $('html, body').animate({
+            scrollTop: $li.offset().top
+            }, 2000);
+    });
+    // $('form#connect').submit(function(event) {
+    //     var socket = io({forceNew: true});
+    //     socket.on('my response', function(msg) {
+    //     $('#log').append('<p>Received: ' + msg.data + '</p>');
+    //     });
+    //     return false;
+    // });
+
+    $('form#emit').submit(function(event) {
+        socket.emit('my event', {data: $('#emit_data').val()});
+        return false;
+    });
+    // $('form#broadcast').submit(function(event) {
+    //     socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
+    //     return false;
+    // });
+    $('form#broadcast').submit(function(event) {
+        socket.emit('my broadcast event', {data: $('#broadcast_data').val()});
+        return false;
+    });
+
+    $('form#create_room').submit(function(event) {
+        socket.emit('create_room', {roomname: $('#create_room_data').val(),username:$('#username_data').val()});
+        return false;
+    });
+
+    $('form#join').submit(function(event) {
+        socket.emit('join', {roomID: $('#roomID').val(),roomname:$('#roomname').val()});
+        return false;
+    });
+    
+    $("#disconnect").click(function() {
+        $('#log').append('<p>Received: ' + "disconnected" + '</p>');
+        socket.close()
+        return false;
+    });
+
+})
+        
+</script>
+</html>
