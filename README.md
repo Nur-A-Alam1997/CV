@@ -2,9 +2,9 @@
 # Flask-ScketIO-Chat-App
 ## WebsocketApplication
 
--Realtimechatapplication 
--Anonymousandauthenticateduseraccess 
--Tools–Python,Flask,SocketIO,SQL,SQLAlchemy.
+* Realtime chat application 
+* Anonymous and authenticateduseraccess 
+* Tools–Python,Flask,SocketIO,SQL,SQLAlchemy.
 
 
 ### build:
