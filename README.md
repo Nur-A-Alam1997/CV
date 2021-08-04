@@ -1,4 +1,3 @@
-# flask-socket-io-chat-app
 # Flask-ScketIO-Chat-App
 ## WebsocketApplication
 
