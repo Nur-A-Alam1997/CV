@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='/css/chat.css') }}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
+    <link rel="icon" href="data:,">  
+</head>
+
+<body class="bg-dark">
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div class="row container d-flex justify-content-center">
+                <div class="col-md-4">
+                    <div class="box box-warning direct-chat direct-chat-warning">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">Chat Messages</h3>
+                            <!-- <div class="box-tools pull-right"> <span data-toggle="tooltip" title="" class="badge bg-yellow" data-original-title="3 New Messages">20</span> <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i> </button> <button type="button" class="btn btn-box-tool" data-toggle="tooltip" title="" data-widget="chat-pane-toggle" data-original-title="Contacts"> <i class="fa fa-comments"></i></button> <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i> </button> </div> -->
+                        </div>
+                        <div class="box-body">
+                            <div class="direct-chat-messages" id="message">
+                                <!-- <div class="direct-chat-msg" id="left" >
+                                    <div class="direct-chat-info clearfix"> <span class="direct-chat-name pull-left">Timona Siera</span> <span class="direct-chat-timestamp pull-right">23 Jan 2:00 pm</span> </div> <img class="direct-chat-img" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="message user image">
+                                    
+                                </div> -->
+                                <!-- <div class="direct-chat-msg right" id ="right">
+                                    <div class="direct-chat-info clearfix"> <span class="direct-chat-name pull-right">Sarah Bullock</span> <span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span> </div> <img class="direct-chat-img" src="https://img.icons8.com/office/36/000000/person-female.png" alt="message user image">
+                                    
+                                </div> -->
+                                
+                            </div>
+                        </div>
+                        <div class="box-footer">
+                            <form action="#" id="broadcast" method="post">                                                                                                                      
+                                <!-- <div class="input-group"> <input type="text" id="broadcast_data" name="message" placeholder="Type Message ..." class="form-control"> <span class="input-group-btn"> <button type="button" class="btn btn-warning btn-flat">Send</button> </span> </div> -->
+                                <div class="input-group"> <input type="text" id="broadcast_data" name="message" placeholder="Type Message ..." class="form-control"> <span class="input-group-btn"> <input class="btn btn-warning btn-flat" type="submit" value="Send"> </span> </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+
+    <script type="text/javascript" charset="utf-8">
+
+    $(document).ready(function(){
+
+    var socket = io();
+
+    socket.on('my response', function(msg) {
+        console.log(socket.id,msg.data,'{{id}}')
+        // socket.to('some room').emit('some event')
+        // $('#log').append('<p>Received: ' + msg.data + '</p>');
+    });
+
+    // var today = new Date().toLocaleDateString('en-GB', {
+    // day : 'numeric',
+    // month : 'short',
+    // // year : 'numeric'
+    // }).split(' ').join(' ');
+    let date = new Date();  
+    let options = {  
+        // weekday: "long", year: "numeric", 
+        month: "short", day: "numeric", 
+        hour: "2-digit", minute: "2-digit"  
+    };  
+    today=date.toLocaleTimeString("en-us", options)
+    console.log(date.toLocaleTimeString("en-us", options));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('username');
+    const room = urlParams.get('room');
+
+    console.log(myParam,room)
+    socket.emit('join', {roomID:room,roomname:myParam}
+    // console.log("emitees")
+    );
+    
+    $('form#broadcast').submit(function(event) {
+        socket.emit('my broadcast event', {data: $('#broadcast_data').val(),room:room});
+        return false;
+    });
+
+    socket.on('join', function(msg) {
+        console.log(msg.user,'{{user}}',msg.data)
+        console.log(typeof(msg.user),typeof('{{user}}'))
+        console.log(msg.user=='{{user}}')
+        {
+            // $("#chat_log").css("color", "blue");
+            $li=$('#message').append(
+            `
+            <span class="direct-chat-timestamp pull-right">${today}</span> 
+            <span class="direct-chat-timestamp pull-right">${msg.data}</span>
+            <div class="direct-chat-text"> </div>
+            </div>`
+            );
+            
+            $("#message").animate({ scrollTop: $('#message')[0].scrollHeight}, 1000);
+            }
+        })
+
+    socket.on('chat', function(msg) {
+        console.log(msg.user,'{{user}}',msg.data)
+        console.log(typeof(msg.user),typeof('{{user}}'))
+        console.log(msg.user=='{{user}}')
+        if (msg.user=='{{user}}'){
+            // $("#chat_log").css("color", "blue");
+            $li=$('#message').append(
+            `
+            <div class="direct-chat-msg right" id="left" >
+            <div class="direct-chat-info clearfix"> <span class="direct-chat-name pull-left">{{user}}</span> <span class="direct-chat-timestamp pull-right">${today}</span> </div> <img class="direct-chat-img" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="message user image">
+            <div class="direct-chat-text"> ${msg.data}</div>
+            </div>`
+            );
+                                    
+            // $('html, body').animate({
+            //     scrollTop: $li.offset().top
+            //     }, 2000);
+            
+
+            $("#message").animate({ scrollTop: $('#message')[0].scrollHeight}, 1000);
+            }
+        if (msg.user!='{{user}}')
+        {   
+            // $("#chat_log").css("color", "red");
+            $li=$('#message').append(
+            `<div class="direct-chat-msg " id="left" >
+            <div class="direct-chat-info clearfix"> <span class="direct-chat-name pull-left">${msg.user}</span> <span class="direct-chat-timestamp pull-right">${today}</span> </div> <img class="direct-chat-img" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="message user image">
+                
+            <div class="direct-chat-text">  ${msg.data} </div>
+            </div>`
+            
+            );
+            // $('html, body').animate({
+            //     scrollTop: $li.offset().top
+            // }, 2000);
+            $("#message").animate({ scrollTop: $('#message')[0].scrollHeight}, 1000);
+            console.log("hala",'{{user}}')
+        }
+    });
+
+    socket.on('disconnect',()=>{
+        socket.close()
+    })
+    
+    $("#disconnect").click(function() {
+        console.log(socket.id)
+        $('#log').append('<p>Received: ' + "disconnected" + '</p>');
+        socket.close()
+        return false;
+    });
+
+})
+        
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
+</html>
